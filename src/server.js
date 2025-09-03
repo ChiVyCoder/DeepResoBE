@@ -1,7 +1,7 @@
 // src/server.js
 require('dotenv').config(); 
 const express = require('express');
-const connectDb = require('./db').connectDb; 
+const connectDb = require('./db'); 
 const corsMiddleware = require('./middlewares/cors'); 
 const favoriteSongRoutes = require('./routes/favoriteSongRoutes'); 
 const userRoutes = require('./routes/userRoutes')
