@@ -1,4 +1,8 @@
 const { Client } = require('pg');
+const { Pool } = require('pg');
+
+let pool;
+
 
 const config = {
   user: process.env.DB_USER,
@@ -7,11 +11,32 @@ const config = {
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
   ssl: {
-    // Đảm bảo cấu hình này đúng để kết nối với cơ sở dữ liệu trên Render
     rejectUnauthorized: false
   }
 };
 
+function getPool() {
+  if (!pool) {
+    console.log("Creating new database connection pool...");
+    pool = new Pool(config);
+    // Lắng nghe sự kiện lỗi trên pool
+    pool.on('error', (err) => {
+      console.error('Lỗi không mong muốn trên pool:', err);
+    });
+  }
+  return pool;
+}
+
+async function closePool() {
+  if (pool) {
+    try {
+      await pool.end();
+      console.log('Database connection pool closed.');
+    } catch (err) {
+      console.error('Lỗi khi đóng pool kết nối:', err);
+    }
+  }
+}
 async function connectDb() {
   const client = new Client(config);
   try {
@@ -25,8 +50,11 @@ async function connectDb() {
 }
 
 // Thay đổi: Export hàm connectDb để file server.js có thể sử dụng
-module.exports = connectDb;
-
+module.exports ={
+connectDb,
+getPool,
+closePool
+} 
 // const sql = require('mssql');
 // const dbConfig = require('../config/dbConfig');
 
