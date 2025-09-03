@@ -1,26 +1,18 @@
-// src/models/favoriteSongModel.js
-const { getPool, sql } = require('../db'); 
+const { getPool } = require('../db/index.js'); 
 
 async function addFavoriteSong(userId, songId, title, artist, thumbnail, songURL, playlist) {
     try {
         const pool = getPool();
-        const request = pool.request();
-
-        request.input('UserId', sql.Int, userId);
-        request.input('SongId', sql.NVarChar(100), songId);
-        request.input('Title', sql.NVarChar(255), title);
-        request.input('Artist', sql.NVarChar(255), artist);
-        request.input('thumbnail', sql.NVarChar(255), thumbnail);
-        request.input('songURL', sql.NVarChar(255), songURL);
-        request.input('playlist', sql.NVarChar(255), playlist);
-
-        const result = await request.query(`
+        const result = await pool.query(
+            `
             INSERT INTO FavoriteSongs (UserId, SongId, Title, Artist, thumbnail, songURL, playlist)
-            VALUES (@UserId, @SongId, @Title, @Artist, @thumbnail, @songURL, @playlist);
-        `);
-        return result.rowsAffected[0] > 0; 
+            VALUES ($1, $2, $3, $4, $5, $6, $7);
+            `,
+            [userId, songId, title, artist, thumbnail, songURL, playlist]
+        );
+        return result.rowCount > 0; 
     } catch (error) {
-        console.error('Error in model addFavoriteSong:', error);
+        console.error('Lỗi ở model addFavoriteSong:', error);
         throw error; 
     }
 }
@@ -29,12 +21,13 @@ async function addFavoriteSong(userId, songId, title, artist, thumbnail, songURL
 async function getFavoriteSongsByUserId(userId) {
     try {
         const pool = getPool();
-        const result = await pool.request()
-            .input('UserId', sql.Int, userId)
-            .query('SELECT Id, SongId, Title, Artist, playlist, thumbnail, songURL FROM FavoriteSongs WHERE UserId = @UserId');
-        return result.recordset;
+        const result = await pool.query(
+            'SELECT Id, SongId, Title, Artist, playlist, thumbnail, songURL FROM FavoriteSongs WHERE UserId = $1',
+            [userId]
+        );
+        return result.rows;
     } catch (error) {
-        console.error('Error in model getFavoriteSongsByUserId:', error);
+        console.error('Lỗi ở model getFavoriteSongsByUserId:', error);
         throw error;
     }
 }
@@ -52,14 +45,14 @@ async function deleteFavoriteSongById(favoriteId, userId) {
             throw new Error('userId không hợp lệ hoặc không phải chuỗi');
         }
 
-        const result = await pool.request()
-            .input('SongId', sql.NVarChar, favoriteId)
-            .input('UserId', sql.NVarChar, userId)
-            .query('DELETE FROM FavoriteSongs WHERE SongId = @SongId AND UserId = @UserId');
+        const result = await pool.query(
+            'DELETE FROM FavoriteSongs WHERE SongId = $1 AND UserId = $2',
+            [favoriteId, userId]
+        );
 
-        return result.rowsAffected[0] > 0;
+        return result.rowCount > 0;
     } catch (error) {
-        console.error('Error in model deleteFavoriteSongById:', error);
+        console.error('Lỗi ở model deleteFavoriteSongById:', error);
         throw error;
     }
 }
