@@ -3,6 +3,23 @@ const { getPool } = require('../db/index.js');
 async function addFavoriteSong(userId, songId, title, artist, thumbnail, songURL, playlist) {
     try {
         const pool = getPool();
+
+        // 1. Kiểm tra xem bài hát đã tồn tại trong danh sách yêu thích của người dùng hay chưa
+        const checkResult = await pool.query(
+            `
+            SELECT 1 
+            FROM FavoriteSongs 
+            WHERE UserId = $1 AND SongId = $2
+            `,
+            [userId, songId]
+        );
+
+        if (checkResult.rows.length > 0) {
+            console.log('Bài hát đã tồn tại trong danh sách yêu thích.');
+            return false; 
+        }
+
+        // 2. Nếu chưa tồn tại, thêm bài hát vào database
         const result = await pool.query(
             `
             INSERT INTO FavoriteSongs (UserId, SongId, Title, Artist, thumbnail, songURL, playlist)
