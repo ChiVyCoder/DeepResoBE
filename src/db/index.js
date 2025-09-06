@@ -1,84 +1,31 @@
-const { Client } = require('pg');
-const { Pool } = require('pg');
+const mongoose = require('mongoose');
 
-let pool;
+// Biến môi trường cho chuỗi kết nối MongoDB
+const MONGO_URI = process.env.MONGO_URI;
 
-
-const config = {
-  user: process.env.DB_USER,
-  host: process.env.DB_SERVER,
-  database: process.env.DB_DATABASE,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  ssl: {
-    rejectUnauthorized: false
-  }
-};
-
-function getPool() {
-  if (!pool) {
-    console.log("Creating new database connection pool...");
-    pool = new Pool(config);
-    // Lắng nghe sự kiện lỗi trên pool
-    pool.on('error', (err) => {
-      console.error('Lỗi không mong muốn trên pool:', err);
-    });
-  }
-  return pool;
-}
-
-async function closePool() {
-  if (pool) {
-    try {
-      await pool.end();
-      console.log('Database connection pool closed.');
-    } catch (err) {
-      console.error('Lỗi khi đóng pool kết nối:', err);
-    }
-  }
-}
+/**
+ * Hàm kết nối đến cơ sở dữ liệu MongoDB
+ */
 async function connectDb() {
-  const client = new Client(config);
+  if (!MONGO_URI) {
+    console.error("Thiếu biến môi trường MONGO_URI!");
+    throw new Error("Không tìm thấy chuỗi kết nối MongoDB.");
+  }
   try {
-    await client.connect();
-    console.log("Database connection successful!");
-    return client;
-  } catch (err) {
-    console.error("Database connection failed!", err);
-    throw err;
+    await mongoose.connect(MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Kết nối đến MongoDB Atlas thành công!");
+  } catch (error) {
+    console.error("Lỗi kết nối đến MongoDB Atlas:", error);
+    throw error;
   }
 }
 
-// Thay đổi: Export hàm connectDb để file server.js có thể sử dụng
-module.exports ={
-connectDb,
-getPool,
-closePool
-} 
-// const sql = require('mssql');
-// const dbConfig = require('../config/dbConfig');
+// Hàm getPool chỉ đơn giản là trả về mongoose để các file model vẫn hoạt động
+function getPool() {
+    return mongoose;
+}
 
-// // Tạo một pool kết nối duy nhất
-// const pool = new sql.ConnectionPool(dbConfig);
-
-// // Hàm để kết nối đến database
-// async function connectDb() {
-//     try {
-//         await pool.connect();
-//         console.log('Connected to SQL Server database pool.');
-//     } catch (err) {
-//         console.error('Database connection failed!', err);
-//         process.exit(1); 
-//     }
-// }
-
-// // Hàm để lấy pool kết nối
-// function getPool() {
-//     return pool;
-// }
-
-// module.exports = {
-//     connectDb,
-//     getPool,
-//     sql
-// };
+module.exports = { connectDb, getPool };
