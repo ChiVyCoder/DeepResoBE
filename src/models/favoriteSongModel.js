@@ -3,10 +3,10 @@ const { getPool } = require('../db/index.js');
 
 // Định nghĩa lược đồ cho Favorite Song
 const favoriteSongSchema = new mongoose.Schema({
-    userId: { type: String, required: true },
-    songId: { type: String, required: true, unique: true },
-    title: { type: String },
-    artist: { type: String },
+    UserId: { type: String, required: true },
+    SongId: { type: String, required: true, unique: true },
+    Title: { type: String },
+    Artist: { type: String },
     thumbnail: { type: String },
     songURL: { type: String },
     playlist: { type: String },
@@ -14,14 +14,14 @@ const favoriteSongSchema = new mongoose.Schema({
 
 const FavoriteSong = mongoose.model('FavoriteSong', favoriteSongSchema);
 
-async function addFavoriteSong(userId, songId, title, artist, thumbnail, songURL, playlist) {
+async function addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL, playlist) {
     try {
         const pool = getPool();
         const newFavoriteSong = new FavoriteSong({
-            userId,
-            songId,
-            title,
-            artist,
+            UserId,
+            SongId,
+            Title,
+            Artist,
             thumbnail,
             songURL,
             playlist
