@@ -17,6 +17,12 @@ const FavoriteSong = mongoose.model('FavoriteSong', favoriteSongSchema);
 async function addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL, playlist) {
     try {
         const pool = getPool();
+        const existingSong = await FavoriteSong.findOne({ songId: SongId, UserId: UserId });
+
+        if (existingSong) {
+            console.log('Bài hát đã tồn tại trong danh sách yêu thích.');
+            return false;
+        }
         const newFavoriteSong = new FavoriteSong({
             UserId,
             SongId,
@@ -26,13 +32,11 @@ async function addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL
             songURL,
             playlist
         });
+        
         await newFavoriteSong.save();
+        console.log('Bài hát đã được thêm vào danh sách yêu thích.');
         return true; 
     } catch (error) {
-        if (error.code === 11000) {
-            console.log('Bài hát đã tồn tại trong danh sách yêu thích.');
-            return false;
-        }
         console.error('Lỗi ở model addFavoriteSong:', error);
         throw error; 
     }
