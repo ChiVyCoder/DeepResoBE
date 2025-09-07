@@ -39,10 +39,10 @@ async function addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL
 }
 
 // Hàm để lấy danh sách bài hát yêu thích của một người dùng
-async function getFavoriteSongsByUserId(userId) {
+async function getFavoriteSongsByUserId(UserId) {
     try {
         const pool = getPool();
-        const favorites = await FavoriteSong.find({ userId });
+        const favorites = await FavoriteSong.find({ UserId });
         return favorites;
     } catch (error) {
         console.error('Lỗi ở model getFavoriteSongsByUserId:', error);
@@ -54,7 +54,7 @@ async function getFavoriteSongsByUserId(userId) {
 async function deleteFavoriteSongById(favoriteId, userId) {
     try {
         const pool = getPool();
-        const result = await FavoriteSong.deleteOne({ songId: favoriteId, userId: userId });
+        const result = await FavoriteSong.deleteOne({ SongId: favoriteId, UserId: userId });
         return result.deletedCount > 0;
     } catch (error) {
         console.error('Lỗi ở model deleteFavoriteSongById:', error);
