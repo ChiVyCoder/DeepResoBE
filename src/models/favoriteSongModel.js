@@ -4,11 +4,11 @@ const { getPool } = require('../db/index.js');
 // Định nghĩa lược đồ cho Favorite Song
 const favoriteSongSchema = new mongoose.Schema({
     UserId: { type: String, required: true },
-    SongId: { type: String, required: true, unique: true },
+    SongId: { type: String, required: true },
     Title: { type: String },
     Artist: { type: String },
     thumbnail: { type: String },
-    songURL: { type: String },
+    songURL: { type: String }, 
     playlist: { type: String },
 });
 
@@ -17,7 +17,7 @@ const FavoriteSong = mongoose.model('FavoriteSong', favoriteSongSchema);
 async function addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL, playlist) {
     try {
         const pool = getPool();
-        const existingSong = await FavoriteSong.findOne({ songId: SongId, UserId: UserId });
+        const existingSong = await FavoriteSong.findOne({ SongId: SongId, UserId: UserId });
 
         if (existingSong) {
             console.log('Bài hát đã tồn tại trong danh sách yêu thích.');
