@@ -3,22 +3,34 @@ const favoriteSongModel = require('../models/favoriteSongModel');
 
 // Controller cho việc thêm bài hát yêu thích
 async function addFavoriteSong(req, res) {
-    const { UserId, SongId, Title, Artist, thumbnail, songURL } = req.body;
+    const { userId, songId, title, artist, thumbnail, songURL, playlist } = req.body;
 
-    if (!UserId || !SongId || !Title || !Artist || !thumbnail || !songURL) {
-        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: UserId, SongId, Title, Artist.' });
+    if (!userId || !songId || !title || !artist || !thumbnail || !songURL) {
+        return res.status(400).json({ 
+            message: 'Vui lòng cung cấp đầy đủ thông tin: userId, songId, title, artist, thumbnail, songURL.' 
+        });
     }
 
     try {
-        const success = await favoriteSongModel.addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL);
+        const success = await favoriteSongModel.addFavoriteSong(
+            userId, songId, title, artist, thumbnail, songURL, playlist
+        );
+
         if (success) {
-            res.status(201).json({ message: 'Bài hát đã được thêm vào danh sách yêu thích thành công!' });
+            res.status(201).json({ 
+                message: 'Bài hát đã được thêm vào danh sách yêu thích thành công!' 
+            });
         } else {
-            res.status(500).json({ message: 'Không thể thêm bài hát vào danh sách yêu thích.' });
+            res.status(409).json({  // dùng 409 Conflict thay vì 500
+                message: 'Bài hát đã tồn tại trong danh sách yêu thích.' 
+            });
         }
     } catch (error) {
         console.error('Error in controller addFavoriteSong:', error);
-        res.status(500).json({ message: 'Đã xảy ra lỗi server khi thêm bài hát yêu thích.', error: error.message });
+        res.status(500).json({ 
+            message: 'Đã xảy ra lỗi server khi thêm bài hát yêu thích.', 
+            error: error.message 
+        });
     }
 }
 

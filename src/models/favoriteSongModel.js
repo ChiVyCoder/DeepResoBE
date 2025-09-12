@@ -3,10 +3,10 @@ const { getPool } = require('../db/index.js');
 
 // Định nghĩa lược đồ cho Favorite Song
 const favoriteSongSchema = new mongoose.Schema({
-    UserId: { type: String, required: true },
-    SongId: { type: String, required: true },
-    Title: { type: String },
-    Artist: { type: String },
+    userId: { type: String, required: true },
+    songId: { type: String, required: true },
+    title: { type: String },
+    artist: { type: String },
     thumbnail: { type: String },
     songURL: { type: String }, 
     playlist: { type: String },
@@ -14,20 +14,20 @@ const favoriteSongSchema = new mongoose.Schema({
 
 const FavoriteSong = mongoose.model('FavoriteSong', favoriteSongSchema);
 
-async function addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL, playlist) {
+async function addFavoriteSong(userId, songId, title, artist, thumbnail, songURL, playlist) {
     try {
         const pool = getPool();
-        const existingSong = await FavoriteSong.findOne({ SongId: SongId, UserId: UserId });
+        const existingSong = await FavoriteSong.findOne({ songId: songId, userId: userId  });
 
         if (existingSong) {
             console.log('Bài hát đã tồn tại trong danh sách yêu thích.');
             return false;
         }
         const newFavoriteSong = new FavoriteSong({
-            UserId,
-            SongId,
-            Title,
-            Artist,
+            userId,
+            songId,
+            title,
+            artist,
             thumbnail,
             songURL,
             playlist
@@ -43,10 +43,10 @@ async function addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL
 }
 
 // Hàm để lấy danh sách bài hát yêu thích của một người dùng
-async function getFavoriteSongsByUserId(UserId) {
+async function getFavoriteSongsByUserId(userId) {
     try {
         const pool = getPool();
-        const favorites = await FavoriteSong.find({ UserId });
+        const favorites = await FavoriteSong.find({ userId });
         return favorites;
     } catch (error) {
         console.error('Lỗi ở model getFavoriteSongsByUserId:', error);
@@ -58,7 +58,7 @@ async function getFavoriteSongsByUserId(UserId) {
 async function deleteFavoriteSongById(favoriteId, userId) {
     try {
         const pool = getPool();
-        const result = await FavoriteSong.deleteOne({ SongId: favoriteId, UserId: userId });
+        const result = await FavoriteSong.deleteOne({ songId: favoriteId, userId: userId });
         return result.deletedCount > 0;
     } catch (error) {
         console.error('Lỗi ở model deleteFavoriteSongById:', error);
