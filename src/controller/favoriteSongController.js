@@ -3,14 +3,14 @@ const favoriteSongModel = require('../models/favoriteSongModel');
 
 // Controller cho việc thêm bài hát yêu thích
 async function addFavoriteSong(req, res) {
-    const { userId, songId, title, artist, thumbnail, songURL } = req.body;
+    const { UserId, SongId, Title, Artist, thumbnail, songURL } = req.body;
 
-    if (!userId || !songId || !title || !artist || !thumbnail || !songURL) {
-        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: userId, songId, title, artist.' });
-    }
+    // if (!UserId || !SongId || !Title || !Artist || !thumbnail || !songURL) {
+    //     return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: UserId, SongId, Title, Artist.' });
+    // }
 
     try {
-        const success = await favoriteSongModel.addFavoriteSong(userId, songId, title, artist, thumbnail, songURL);
+        const success = await favoriteSongModel.addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL);
         if (success) {
             res.status(201).json({ message: 'Bài hát đã được thêm vào danh sách yêu thích thành công!' });
         } else {
