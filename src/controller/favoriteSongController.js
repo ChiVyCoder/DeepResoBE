@@ -5,9 +5,9 @@ const favoriteSongModel = require('../models/favoriteSongModel');
 async function addFavoriteSong(req, res) {
     const { UserId, SongId, Title, Artist, thumbnail, songURL } = req.body;
 
-    // if (!UserId || !SongId || !Title || !Artist || !thumbnail || !songURL) {
-    //     return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: UserId, SongId, Title, Artist.' });
-    // }
+    if (!UserId || !SongId || !Title || !Artist || !thumbnail || !songURL) {
+        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: UserId, SongId, Title, Artist.' });
+    }
 
     try {
         const success = await favoriteSongModel.addFavoriteSong(UserId, SongId, Title, Artist, thumbnail, songURL);
